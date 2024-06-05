@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/model/todo.dart'; // Import ToDo model class
 import 'package:todolist/widgets/todo_items.dart'; // Import ToDoItem widget
+
 // Enumeration to represent different task categories
 enum TaskCategory {
   all,
@@ -18,7 +19,8 @@ class TasksScreen extends StatefulWidget {
 class _TasksScreenState extends State<TasksScreen> {
   List<ToDo> todosList = ToDo.todoList(); // List of all tasks
   List<ToDo> _foundToDo = []; // List of tasks to display based on category
-  TaskCategory _selectedCategory = TaskCategory.all; // Default selected category
+  TaskCategory _selectedCategory =
+      TaskCategory.all; // Default selected category
 
   @override
   void initState() {
@@ -34,10 +36,14 @@ class _TasksScreenState extends State<TasksScreen> {
           _foundToDo = todosList; // Display all tasks
           break;
         case TaskCategory.completed:
-          _foundToDo = todosList.where((todo) => todo.isDone).toList(); // Display completed tasks
+          _foundToDo = todosList
+              .where((todo) => todo.isDone)
+              .toList(); // Display completed tasks
           break;
         case TaskCategory.pending:
-          _foundToDo = todosList.where((todo) => !todo.isDone).toList(); // Display pending tasks
+          _foundToDo = todosList
+              .where((todo) => !todo.isDone)
+              .toList(); // Display pending tasks
           break;
       }
     });
@@ -57,6 +63,47 @@ class _TasksScreenState extends State<TasksScreen> {
       todosList.removeWhere((item) => item.id == id); // Remove task from list
       _updateTasks(); // Update displayed tasks after deletion
     });
+  }
+
+  // Method to handle task editing
+  void _editToDoItem(ToDo todo) {
+    // Show a dialog to edit the task text
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        String editedTaskText =
+            todo.todoText; // Initialize edited text with current task text
+        return AlertDialog(
+          title: Text('Edit Task'),
+          content: TextField(
+            autofocus: true,
+            controller: TextEditingController(
+                text: todo.todoText), // Set initial text in text field
+            onChanged: (value) {
+              editedTaskText = value; // Update editedTaskText as the user types
+            },
+            decoration: InputDecoration(hintText: 'Enter updated task...'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Update the task text and update the tasks
+                todo.todoText = editedTaskText;
+                _updateTasks();
+                Navigator.pop(dialogContext); // Close the dialog
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Method to show dialog for adding a new task
@@ -145,7 +192,7 @@ class _TasksScreenState extends State<TasksScreen> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF883007),
+        backgroundColor: Color.fromARGB(255, 9, 120, 224),
         iconTheme: IconThemeData(color: Colors.white),
       ),
       drawer: Drawer(
@@ -154,7 +201,7 @@ class _TasksScreenState extends State<TasksScreen> {
           children: [
             UserAccountsDrawerHeader(
               currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage("assets/profile.jpeg"),
+                backgroundImage: AssetImage("/assets/student.jpg"),
               ),
               accountName: Text("Student"),
               accountEmail: Text("student@gmail.com"),
@@ -168,7 +215,8 @@ class _TasksScreenState extends State<TasksScreen> {
             ListTile(
               title: Text("Completed Tasks"),
               leading: Icon(Icons.check_box),
-              onTap: () => _setSelectedCategory(TaskCategory.completed, context),
+              onTap: () =>
+                  _setSelectedCategory(TaskCategory.completed, context),
             ),
             ListTile(
               title: Text("Pending Tasks"),
@@ -205,7 +253,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   contentPadding: EdgeInsets.all(0),
                   prefixIcon: Icon(
                     Icons.search,
-                    color: const Color(0xFF272626),
+                    color: Color.fromARGB(255, 16, 124, 224),
                     size: 20,
                   ),
                   prefixIconConstraints:
@@ -224,6 +272,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   todo: _foundToDo[index],
                   onToDoChanged: _handleToDoChange,
                   onDeleteItem: _deleteToDoItem,
+                  onEditItem: _editToDoItem, // Pass the edit callback function
                 ),
               ),
             ),
@@ -239,7 +288,7 @@ class _TasksScreenState extends State<TasksScreen> {
         tooltip: 'Add New Task',
         child: Icon(Icons.add),
       ),
-      backgroundColor: const Color(0xFFCECAB7),
+      backgroundColor: Color.fromARGB(255, 191, 203, 242),
     );
   }
 }
